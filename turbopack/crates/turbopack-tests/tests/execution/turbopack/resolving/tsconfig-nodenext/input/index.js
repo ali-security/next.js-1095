@@ -14,8 +14,8 @@ it('should correctly resolve explicit extensions with nodenext', () => {
   expect(fileCjs).toBe('file-cjs')
 })
 
-// import fooButton from "foo/button";
+import fooButton from 'foo/button'
 
-// it("should correctly resolve explicit extensions with nodenext", () => {
-//   expect(fooButton).toBe("button");
-// });
+it('should correctly resolve explicit extensions with nodenext', () => {
+  expect(fooButton).toBe('button')
+})
