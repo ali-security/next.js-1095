@@ -2329,12 +2329,11 @@ async fn resolve_relative_request(
             let mut pushed = false;
             if !added_extension_alternatives.is_empty() {
                 for ext in added_extension_alternatives.iter() {
-                    let Some(extensionless_matched_pattern) = matched_pattern.strip_suffix(&**ext)
-                    else {
+                    let Some(matched_pattern) = matched_pattern.strip_suffix(&**ext) else {
                         continue;
                     };
 
-                    if !seen_base_patterns.insert(extensionless_matched_pattern) {
+                    if !seen_base_patterns.insert(matched_pattern) {
                         continue 'matches; // Skip this entire file
                     }
 
@@ -2342,7 +2341,7 @@ async fn resolve_relative_request(
                         // If the fragment is not empty, we need to strip it from the matched
                         // pattern
                         if let Some(extensionless_matched_pattern) =
-                            extensionless_matched_pattern.strip_suffix(fragment.as_str())
+                            matched_pattern.strip_suffix(fragment.as_str())
                         {
                             results.push(
                                 resolved(
@@ -2360,10 +2359,10 @@ async fn resolve_relative_request(
                             pushed = true;
                         }
                     }
-                    if !pushed && path_pattern.is_match(extensionless_matched_pattern) {
+                    if !pushed && path_pattern.is_match(matched_pattern) {
                         results.push(
                             resolved(
-                                RequestKey::new(extensionless_matched_pattern.into()),
+                                RequestKey::new(matched_pattern.into()),
                                 path.clone(),
                                 lookup_path.clone(),
                                 request,
