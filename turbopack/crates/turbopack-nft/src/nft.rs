@@ -89,6 +89,8 @@ async fn node_file_trace_operation(
                 enable_typescript_transform: Some(
                     TypescriptTransformOptions::default().resolved_cell(),
                 ),
+                // enable_types should not be enabled here. It gets set automatically when a TS file
+                // is encountered.
                 ..Default::default()
             },
             css: CssOptionsContext {
