@@ -42,6 +42,7 @@ use turbopack::{
     },
 };
 use turbopack_core::{
+    chunk::SourceMapsType,
     compile_time_info::CompileTimeInfo,
     context::AssetContext,
     environment::{Environment, ExecutionEnvironment, NodeJsEnvironment},
