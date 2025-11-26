@@ -10,7 +10,7 @@ use swc_core::{
     quote,
 };
 use turbo_rcstr::{RcStr, rcstr};
-use turbo_tasks::{ResolvedVc, ValueToString, Vc};
+use turbo_tasks::{ResolvedVc, TryJoinIterExt, ValueToString, Vc};
 use turbo_tasks_fs::FileSystemPath;
 use turbopack_core::{
     chunk::{
@@ -461,16 +461,25 @@ impl ModuleReference for EsmAssetReference {
             Some(self.issue_source),
         )
         .await?;
-        let modules = result.primary_modules().await?;
-        debug_assert!(
-            modules.len() <= 1,
-            "EsmAssetReference request {request} resolved to {num} results",
-            request = &self.request,
-            num = modules.len()
-        );
+        if cfg!(debug_assertions) {
+            let modules = result.primary_modules().await?;
+            if modules.len() > 1 {
+                panic!(
+                    "EsmAssetReference request '{request}' resolved to {num} \
+                     results:\n{detailed:?}",
+                    request = &self.request,
+                    num = modules.len(),
+                    detailed = modules
+                        .iter()
+                        .map(|m| m.ident().to_string())
+                        .try_join()
+                        .await?
+                );
+            }
+        }
 
         if let Some(ModulePart::Export(export_name)) = &self.export_name {
-            for &module in modules {
+            for &module in result.primary_modules().await? {
                 if let Some(module) = ResolvedVc::try_downcast(module)
                     && *is_export_missing(*module, export_name.clone()).await?
                 {
