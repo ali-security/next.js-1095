@@ -7,8 +7,8 @@ import { EdgeRouteModuleWrapper } from '../../server/web/edge-route-module-wrapp
 import * as module from 'VAR_USERLAND'
 
 // injected by the loader afterwards.
-declare const nextConfig: NextConfigComplete
-// INJECT:nextConfig
+declare const cacheLifeProfiles: NextConfigComplete['cacheLife']
+// INJECT:cacheLifeProfiles
 
 const maybeJSONParse = (str?: string) => (str ? JSON.parse(str) : undefined)
 
@@ -26,7 +26,7 @@ if (rscManifest && rscServerManifest) {
 export const ComponentMod = module
 
 const handler: EdgeHandler = EdgeRouteModuleWrapper.wrap(module.routeModule, {
-  nextConfig,
+  cacheLifeProfiles,
   page: 'VAR_PAGE',
 })
 export default handler
