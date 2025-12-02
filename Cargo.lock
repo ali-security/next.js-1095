@@ -9239,6 +9239,7 @@ dependencies = [
  "tokio-util",
  "tracing",
  "triomphe 0.1.12",
+ "turbo-bincode",
  "turbo-dyn-eq-hash",
  "turbo-rcstr",
  "turbo-tasks-hash",
