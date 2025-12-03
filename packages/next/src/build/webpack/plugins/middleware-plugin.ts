@@ -132,9 +132,12 @@ function getEntryFiles(
       `server/${MIDDLEWARE_BUILD_MANIFEST}.js`,
       `server/${MIDDLEWARE_REACT_LOADABLE_MANIFEST}.js`,
       `server/${NEXT_FONT_MANIFEST}.js`,
-      `server/${INTERCEPTION_ROUTE_REWRITE_MANIFEST}.js`,
-      `${SERVER_FILES_MANIFEST}.js`
+      `server/${INTERCEPTION_ROUTE_REWRITE_MANIFEST}.js`
     )
+
+    if (!opts.dev) {
+      files.push(`${SERVER_FILES_MANIFEST}.js`)
+    }
   }
 
   if (hasInstrumentationHook) {
