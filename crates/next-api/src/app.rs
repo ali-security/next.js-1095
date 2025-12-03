@@ -1527,8 +1527,10 @@ impl AppEndpoint {
                 let mut file_paths_from_root = fxindexset![
                     rcstr!("server/middleware-build-manifest.js"),
                     rcstr!("server/interception-route-rewrite-manifest.js"),
-                    rcstr!("required-server-files.js"),
                 ];
+                if project.next_mode().await?.is_production() {
+                    file_paths_from_root.insert(rcstr!("required-server-files.js"));
+                }
                 if emit_manifests == EmitManifests::Full {
                     file_paths_from_root.insert(rcstr!("server/next-font-manifest.js"));
                 };
