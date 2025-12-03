@@ -337,7 +337,7 @@ export abstract class RouteModule<
           : loadManifestFromRelativePath<RequiredServerFilesManifest>({
               projectDir,
               distDir: this.distDir,
-              manifest: SERVER_FILES_MANIFEST,
+              manifest: `${SERVER_FILES_MANIFEST}.json`,
             }),
         this.isDev
           ? 'development'
