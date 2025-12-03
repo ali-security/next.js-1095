@@ -1931,16 +1931,15 @@ export default async function build(
             )
             // If there's edge routes, append the edge instrumentation hook
             // Turbopack generates this chunk with a hashed name and references it in middleware-manifest.
+            let edgeInstrumentationHook = path.join(
+              SERVER_DIRECTORY,
+              `edge-${INSTRUMENTATION_HOOK_FILENAME}.js`
+            )
             if (
               bundler !== Bundler.Turbopack &&
-              (edgeRuntimeAppCount || edgeRuntimePagesCount)
+              existsSync(path.join(distDir, edgeInstrumentationHook))
             ) {
-              serverFilesManifest.files.push(
-                path.join(
-                  SERVER_DIRECTORY,
-                  `edge-${INSTRUMENTATION_HOOK_FILENAME}.js`
-                )
-              )
+              serverFilesManifest.files.push(edgeInstrumentationHook)
             }
           }
 
