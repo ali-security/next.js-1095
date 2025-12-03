@@ -1449,9 +1449,10 @@ impl PageEndpoint {
                             rcstr!("server/server-reference-manifest.js"),
                             rcstr!("server/middleware-build-manifest.js"),
                             rcstr!("server/next-font-manifest.js"),
+                            rcstr!("required-server-files.js"),
                         ]
                     } else {
-                        fxindexset![]
+                        fxindexset![rcstr!("required-server-files.js"),]
                     };
 
                     let all_assets = assets.concatenate(*referenced_assets);
