@@ -621,7 +621,6 @@ export function getEdgeServerEntry(opts: {
       absolutePagePath: opts.absolutePagePath,
       page: opts.page,
       appDirLoader: Buffer.from(opts.appDirLoader || '').toString('base64'),
-      nextConfig: Buffer.from(JSON.stringify(opts.config)).toString('base64'),
       preferredRegion: opts.preferredRegion,
       middlewareConfig: Buffer.from(
         JSON.stringify(opts.middlewareConfig || {})
