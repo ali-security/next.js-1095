@@ -1571,3 +1571,171 @@ export async function normalizeConfig(phase: string, config: any) {
   // Support `new Promise` and `async () =>` as return values of the config export
   return await config
 }
+
+// The Vercel builder needs these fields (read `config` in required-server-files.json)
+// {
+//   pageExtensions: string[];
+//   experimental?: {
+//     cacheComponents?: boolean;
+//     clientParamParsingOrigins?: string[];
+//     clientSegmentCache?: boolean;
+//     ppr?: boolean | 'incremental';
+//     serverActions?: Record<string, never>;
+//   };
+// };
+export interface NextConfigRuntime {
+  // TODO remove in some cases
+  deploymentId: NextConfigComplete['deploymentId']
+
+  configFileName?: string
+
+  // Should only be included when using isExperimentalCompile
+  env?: NextConfigComplete['env']
+
+  distDir: NextConfigComplete['distDir']
+  cacheComponents: NextConfigComplete['cacheComponents']
+  htmlLimitedBots: NextConfigComplete['htmlLimitedBots']
+  assetPrefix: NextConfigComplete['assetPrefix']
+  output: NextConfigComplete['output']
+  crossOrigin: NextConfigComplete['crossOrigin']
+  trailingSlash: NextConfigComplete['trailingSlash']
+  images: NextConfigComplete['images']
+  reactMaxHeadersLength: NextConfigComplete['reactMaxHeadersLength']
+  cacheLife: NextConfigComplete['cacheLife']
+  basePath: NextConfigComplete['basePath']
+  expireTime: NextConfigComplete['expireTime']
+  generateEtags: NextConfigComplete['generateEtags']
+  poweredByHeader: NextConfigComplete['poweredByHeader']
+  cacheHandler: NextConfigComplete['cacheHandler']
+  cacheHandlers: NextConfigComplete['cacheHandlers']
+  cacheMaxMemorySize: NextConfigComplete['cacheMaxMemorySize']
+  compress: NextConfigComplete['compress']
+  i18n: NextConfigComplete['i18n']
+  httpAgentOptions: NextConfigComplete['httpAgentOptions']
+  skipProxyUrlNormalize: NextConfigComplete['skipProxyUrlNormalize']
+  pageExtensions: NextConfigComplete['pageExtensions']
+
+  experimental: Pick<
+    NextConfigComplete['experimental'],
+    | 'ppr'
+    | 'taint'
+    | 'serverActions'
+    | 'staleTimes'
+    | 'dynamicOnHover'
+    | 'inlineCss'
+    | 'authInterrupts'
+    | 'clientTraceMetadata'
+    | 'clientParamParsingOrigins'
+    | 'adapterPath'
+    | 'allowedRevalidateHeaderKeys'
+    | 'fetchCacheKeyPrefix'
+    | 'isrFlushToDisk'
+    | 'optimizeCss'
+    | 'nextScriptWorkers'
+    | 'disableOptimizedLoading'
+    | 'largePageDataBytes'
+    | 'serverComponentsHmrCache'
+    | 'caseSensitiveRoutes'
+    | 'validateRSCRequestHeaders'
+    | 'sri'
+    | 'useSkewCookie'
+    | 'preloadEntriesOnStart'
+    | 'hideLogsAfterAbort'
+    | 'removeUncaughtErrorAndRejectionListeners'
+    | 'imgOptConcurrency'
+    | 'imgOptMaxInputPixels'
+    | 'imgOptSequentialRead'
+    | 'imgOptSkipMetadata'
+    | 'imgOptTimeoutInSeconds'
+    | 'proxyClientMaxBodySize'
+  > & {
+    // Pick on @internal fields generates invalid .d.ts files
+    /** @internal */
+    trustHostHeader?: NextConfigComplete['experimental']['trustHostHeader']
+    /** @internal */
+    isExperimentalCompile?: NextConfigComplete['experimental']['isExperimentalCompile']
+  }
+}
+
+export function getNextConfigRuntime(
+  config: NextConfigComplete
+): NextConfigRuntime {
+  let experimental: NextConfigRuntime['experimental'] = config.experimental
+    ? {
+        ppr: config.experimental.ppr,
+        taint: config.experimental.taint,
+        serverActions: config.experimental.serverActions,
+        staleTimes: config.experimental.staleTimes,
+        dynamicOnHover: config.experimental.dynamicOnHover,
+        inlineCss: config.experimental.inlineCss,
+        authInterrupts: config.experimental.authInterrupts,
+        clientTraceMetadata: config.experimental.clientTraceMetadata,
+        clientParamParsingOrigins:
+          config.experimental.clientParamParsingOrigins,
+        adapterPath: config.experimental.adapterPath,
+        allowedRevalidateHeaderKeys:
+          config.experimental.allowedRevalidateHeaderKeys,
+        fetchCacheKeyPrefix: config.experimental.fetchCacheKeyPrefix,
+        isrFlushToDisk: config.experimental.isrFlushToDisk,
+        optimizeCss: config.experimental.optimizeCss,
+        nextScriptWorkers: config.experimental.nextScriptWorkers,
+        disableOptimizedLoading: config.experimental.disableOptimizedLoading,
+        largePageDataBytes: config.experimental.largePageDataBytes,
+        serverComponentsHmrCache: config.experimental.serverComponentsHmrCache,
+        caseSensitiveRoutes: config.experimental.caseSensitiveRoutes,
+        validateRSCRequestHeaders:
+          config.experimental.validateRSCRequestHeaders,
+        sri: config.experimental.sri,
+        useSkewCookie: config.experimental.useSkewCookie,
+        preloadEntriesOnStart: config.experimental.preloadEntriesOnStart,
+        hideLogsAfterAbort: config.experimental.hideLogsAfterAbort,
+        removeUncaughtErrorAndRejectionListeners:
+          config.experimental.removeUncaughtErrorAndRejectionListeners,
+        imgOptConcurrency: config.experimental.imgOptConcurrency,
+        imgOptMaxInputPixels: config.experimental.imgOptMaxInputPixels,
+        imgOptSequentialRead: config.experimental.imgOptSequentialRead,
+        imgOptSkipMetadata: config.experimental.imgOptSkipMetadata,
+        imgOptTimeoutInSeconds: config.experimental.imgOptTimeoutInSeconds,
+        proxyClientMaxBodySize: config.experimental.proxyClientMaxBodySize,
+
+        trustHostHeader: config.experimental.trustHostHeader,
+        isExperimentalCompile: config.experimental.isExperimentalCompile,
+      }
+    : {}
+
+  let runtimeConfig: NextConfigRuntime = {
+    configFileName: undefined,
+
+    distDir: config.distDir,
+    deploymentId: config.deploymentId,
+    cacheComponents: config.cacheComponents,
+    htmlLimitedBots: config.htmlLimitedBots,
+    assetPrefix: config.assetPrefix,
+    output: config.output,
+    crossOrigin: config.crossOrigin,
+    trailingSlash: config.trailingSlash,
+    images: config.images,
+    reactMaxHeadersLength: config.reactMaxHeadersLength,
+    cacheLife: config.cacheLife,
+    basePath: config.basePath,
+    expireTime: config.expireTime,
+    generateEtags: config.generateEtags,
+    poweredByHeader: config.poweredByHeader,
+    cacheHandler: config.cacheHandler,
+    cacheHandlers: config.cacheHandlers,
+    cacheMaxMemorySize: config.cacheMaxMemorySize,
+    compress: config.compress,
+    i18n: config.i18n,
+    httpAgentOptions: config.httpAgentOptions,
+    skipProxyUrlNormalize: config.skipProxyUrlNormalize,
+    pageExtensions: config.pageExtensions,
+
+    experimental,
+  }
+
+  if (config.experimental.isExperimentalCompile) {
+    runtimeConfig.env = config.env
+  }
+
+  return runtimeConfig
+}

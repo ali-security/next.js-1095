@@ -1,5 +1,9 @@
 import type { PagesManifest } from './webpack/plugins/pages-manifest-plugin'
-import type { ExportPathMap, NextConfigComplete } from '../server/config-shared'
+import type {
+  ExportPathMap,
+  NextConfigComplete,
+  NextConfigRuntime,
+} from '../server/config-shared'
 import type { MiddlewareManifest } from './webpack/plugins/middleware-plugin'
 import type { ActionManifest } from './webpack/plugins/flight-client-entry-plugin'
 import type { CacheControl, Revalidate } from '../server/lib/cache-control'
@@ -12,7 +16,7 @@ import { makeRe } from 'next/dist/compiled/picomatch'
 import { existsSync, promises as fs } from 'fs'
 import os from 'os'
 import { Worker } from '../lib/worker'
-import { defaultConfig } from '../server/config-shared'
+import { defaultConfig, getNextConfigRuntime } from '../server/config-shared'
 import devalue from 'next/dist/compiled/devalue'
 import findUp from 'next/dist/compiled/find-up'
 import { nanoid } from 'next/dist/compiled/nanoid/index.cjs'
@@ -605,7 +609,7 @@ async function writeFunctionsConfigManifest(
 
 export interface RequiredServerFilesManifest {
   version: number
-  config: NextConfigComplete
+  config: NextConfigRuntime
   appDir: string
   relativeAppDir: string
   files: string[]
@@ -657,6 +661,7 @@ async function writeImagesManifest(
 
 const STANDALONE_DIRECTORY = 'standalone' as const
 async function writeStandaloneDirectory(
+  config: NextConfigComplete,
   nextBuildSpan: Span,
   distDir: string,
   pageKeys: { pages: string[]; app: string[] | undefined },
@@ -689,7 +694,7 @@ async function writeStandaloneDirectory(
 
       for (const file of [
         ...requiredServerFiles.files,
-        path.join(requiredServerFiles.config.distDir, SERVER_FILES_MANIFEST),
+        path.join(config.distDir, SERVER_FILES_MANIFEST),
         ...loadedEnvFiles.reduce<string[]>((acc, envFile) => {
           if (['.env', '.env.production'].includes(envFile.path)) {
             acc.push(envFile.path)
@@ -2447,11 +2452,12 @@ export default async function build(
             }
           }
 
+          let runtimeConfig = getNextConfigRuntime(config)
+
           const serverFilesManifest: RequiredServerFilesManifest = {
             version: 1,
             config: {
-              ...config,
-              configFile: undefined,
+              ...runtimeConfig,
               ...(ciEnvironment.hasNextSupport
                 ? {
                     compress: false,
@@ -4123,6 +4129,7 @@ export default async function build(
           .traceChild('output-standalone')
           .traceAsyncFn(async () => {
             await writeStandaloneDirectory(
+              config,
               nextBuildSpan,
               distDir,
               pageKeys,
