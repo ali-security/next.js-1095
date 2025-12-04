@@ -2417,8 +2417,6 @@ export default async function build(
         )
       }
 
-      const { cacheHandler } = config
-
       const instrumentationHookEntryFiles: string[] = []
       if (hasInstrumentationHook) {
         instrumentationHookEntryFiles.push(
@@ -2442,17 +2440,16 @@ export default async function build(
       const requiredServerFilesManifest = nextBuildSpan
         .traceChild('generate-required-server-files')
         .traceFn(() => {
-          const normalizedCacheHandlers: Record<string, string> = {}
+          let runtimeConfig = getNextConfigRuntime(config)
 
+          const normalizedCacheHandlers: Record<string, string> = {}
           for (const [key, value] of Object.entries(
-            config.cacheHandlers || {}
+            runtimeConfig.cacheHandlers || {}
           )) {
             if (key && value) {
               normalizedCacheHandlers[key] = path.relative(distDir, value)
             }
           }
-
-          let runtimeConfig = getNextConfigRuntime(config)
 
           const serverFilesManifest: RequiredServerFilesManifest = {
             version: 1,
@@ -2463,12 +2460,12 @@ export default async function build(
                     compress: false,
                   }
                 : {}),
-              cacheHandler: cacheHandler
-                ? path.relative(distDir, cacheHandler)
-                : config.cacheHandler,
+              cacheHandler: runtimeConfig.cacheHandler
+                ? path.relative(distDir, runtimeConfig.cacheHandler)
+                : runtimeConfig.cacheHandler,
               cacheHandlers: normalizedCacheHandlers,
               experimental: {
-                ...config.experimental,
+                ...runtimeConfig.experimental,
                 trustHostHeader: ciEnvironment.hasNextSupport,
                 isExperimentalCompile: isCompileMode,
               },
